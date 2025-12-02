@@ -12,32 +12,31 @@ const Market = () => {
   const currentMarketData = useSelector((state) => state.market); // Get the current market data from the Redux store
   const marketDataCache = useRef({}); // Create a ref to store the market data cache
 
-  // Function to fetch market data from the API
-  const getData = async () => {
-    const currencyCode = currency.code; // Get the current currency code
-
-    // Check if data for the current currency is already in the cache
-    if (marketDataCache.current[currencyCode]) {
-      dispatch(setMarketData(marketDataCache.current[currencyCode])); // Use cached data
-      return;
-    }
-
-    const API = MarketData(currencyCode); // Generate the API URL based on the currency code
-    try {
-      const response = await fetch(API); // Fetch the data from the API
-      const json = await response.json(); // Parse the JSON response
-      const sorted = sort(json); // Sort the data
-      marketDataCache.current[currencyCode] = sorted; // Cache the new data
-      dispatch(setMarketData(sorted)); // Dispatch the new data to the Redux store
-    } catch (err) {
-      console.log(err); // Log any errors
-    }
-  };
-
   // Fetch data whenever the currency code changes
   useEffect(() => {
+    const getData = async () => {
+      const currencyCode = currency.code; // Get the current currency code
+  
+      // Check if data for the current currency is already in the cache
+      if (marketDataCache.current[currencyCode]) {
+        dispatch(setMarketData(marketDataCache.current[currencyCode])); // Use cached data
+        return;
+      }
+  
+      const API = MarketData(currencyCode); // Generate the API URL based on the currency code
+      try {
+        const response = await fetch(API); // Fetch the data from the API
+        const json = await response.json(); // Parse the JSON response
+        const sorted = sort(json); // Sort the data
+        marketDataCache.current[currencyCode] = sorted; // Cache the new data
+        dispatch(setMarketData(sorted)); // Dispatch the new data to the Redux store
+      } catch (err) {
+        console.log(err); // Log any errors
+      }
+    };
+
     getData();
-  }, [currency.code]);
+  }, [currency.code, dispatch]);
 
   return (
     <div className="bg-white h-[85vh] rounded-lg border border-black overflow-hidden">
